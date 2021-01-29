@@ -10,7 +10,6 @@ How to create a contact form with Netlify, Gatsby.js and Mailgun</h1>
 
 This is a tutorial to help you create a contact form with MailGun, Gatsby.js and Netlify. You can read the all article related to this repository [here](https://medium.com/javascript-in-plain-english/jamstack-how-to-do-a-contact-form-step-by-step-with-gatsby-js-netlify-and-mailgun-52d26432a5c4).
 
-
 ## 🚀 Quick start
 
 1.  **Add your own development variables.**
