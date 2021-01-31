@@ -1,46 +1,33 @@
-// Gatsby settings for the environment variables
-require("dotenv").config({
-  path: `.env.${process.env.NODE_ENV}`,
-})
-const headers = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "Content-Type",
-}
-const successCode = 200
-const errorCode = 400
+const envConfig = require('dotenv').config({ path: `.env.${process.env.NODE_ENV}` });
+const sgMail = require('@sendgrid/mail');
+const { SENDGRID_API_KEY, SENDGRID_TO_EMAIL } = process.env;
 
-// Connect to our Mailgun API
-const mailgun = require("mailgun-js")
-const mg = mailgun({
-  apiKey: process.env.MAILGUN_API_KEY,
-  domain: process.env.MAILGUN_DOMAIN,
-})
+exports.handler = async event => {
+  const payload = JSON.parse(event.body);
+  const { email, message } = payload;
 
-// Our Netlify function
-export function handler(event, context, callback) {
-  let data = JSON.parse(event.body)
-  let { name, email, message } = data
-  let mailOptions = {
-    from: `${name} <${email}>`,
-    to: process.env.MY_EMAIL_ADDRESS,
-    replyTo: email,
-    text: `${message}`,
+  sgMail.setApiKey(SENDGRID_API_KEY);
+
+  const msg = {
+    to: SENDGRID_TO_EMAIL,
+    from: email,
+    subject: `New message from yourdomain.com`,
+    text: message,
+  };
+
+  try {
+    await sgMail.send(msg);
+
+    return {
+      statusCode: 202,
+      body: 'Message sent',
+    };
+  } catch (error) {
+    const statusCode = typeof error.code === 'number' ? error.code : 500;
+
+    return {
+      statusCode,
+      body: error.message,
+    };
   }
-
-  // Our MailGun code
-  mg.messages().send(mailOptions, function(error, body) {
-    if (error) {
-      callback(null, {
-        errorCode,
-        headers,
-        body: JSON.stringify(error),
-      })
-    } else {
-      callback(null, {
-        successCode,
-        headers,
-        body: JSON.stringify(body),
-      })
-    }
-  })
-}
+};

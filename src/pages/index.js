@@ -1,7 +1,8 @@
 import React from "react"
 
-import Contact from "../components/Contact"
+// import Contact from "../components/Contact"
+import { ContactForm } from "../components/ContactForm"
 
-const IndexPage = () => <Contact></Contact>
+const IndexPage = () => <ContactForm />
 
 export default IndexPage
